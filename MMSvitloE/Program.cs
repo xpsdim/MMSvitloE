@@ -73,7 +73,7 @@ namespace MMSvitloE
 				StatusChangedAtUtc = DateTime.UtcNow;
 			}
 			//TODO comment it after testing
-			Console.WriteLine($"new status: {newStatus}: {TimeZoneInfo.ConvertTimeFromUtc(now, KyivTimezone):HH:mm dd.MM.yyyy}");
+			//Console.WriteLine($"new status: {newStatus}: {TimeZoneInfo.ConvertTimeFromUtc(now, KyivTimezone):HH:mm dd.MM.yyyy}");
 		}
 
 
