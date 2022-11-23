@@ -29,7 +29,7 @@ namespace MMSvitloE
 						msg = "Світло Є!";
 					}
 
-					Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
+					//Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
 					await botClient.SendTextMessageAsync(message.Chat, msg);
 					return;
 				}
@@ -39,7 +39,7 @@ namespace MMSvitloE
 		public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
 		{
 			// Just write error to console
-			Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
+			//Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
 		}
 
 		public static void InitConfiguration()
@@ -73,7 +73,7 @@ namespace MMSvitloE
 				receiverOptions,
 				cancellationToken
 			);
-			Console.WriteLine("Bot Started " + bot.GetMeAsync().Result.FirstName);
+			//Console.WriteLine("Bot Started " + bot.GetMeAsync().Result.FirstName);
 			Thread.Sleep(Timeout.Infinite);
 		}
 	}
