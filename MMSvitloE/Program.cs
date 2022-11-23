@@ -29,6 +29,7 @@ namespace MMSvitloE
 						msg = "Світло Є!";
 					}
 
+					Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
 					await botClient.SendTextMessageAsync(message.Chat, msg);
 					return;
 				}
@@ -59,7 +60,6 @@ namespace MMSvitloE
 		static void Main(string[] args)
 		{
 			InitConfiguration();
-			Console.WriteLine("Запущено бота " + bot.GetMeAsync().Result.FirstName);
 
 			var cts = new CancellationTokenSource();
 			var cancellationToken = cts.Token;
@@ -73,6 +73,7 @@ namespace MMSvitloE
 				receiverOptions,
 				cancellationToken
 			);
+			Console.WriteLine("Bot Started " + bot.GetMeAsync().Result.FirstName);
 			Console.ReadLine();
 		}
 	}
