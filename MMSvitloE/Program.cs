@@ -74,7 +74,7 @@ namespace MMSvitloE
 				cancellationToken
 			);
 			Console.WriteLine("Bot Started " + bot.GetMeAsync().Result.FirstName);
-			Console.ReadLine();
+			Thread.Sleep(Timeout.Infinite);
 		}
 	}
 }
