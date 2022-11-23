@@ -14,6 +14,9 @@ namespace MMSvitloE
 	{
 		public static ITelegramBotClient bot = null;
 		public static IConfigurationRoot configuration;
+		public static DateTime? StatusChangedAtUtc = null;
+		public static bool Status = true;
+		public static TimeZoneInfo KyivTimezone = TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
 
 		public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 		{
@@ -22,11 +25,15 @@ namespace MMSvitloE
 				var message = update.Message;
 				if (message.Text?.ToLower() == "/start")
 				{
-					var pingResult = new Utils().PingHost(configuration["ipToPing"]);
-					var msg = "Нема :(";
-					if (pingResult)
+					var timeMsgPart = string.Empty;
+					if (StatusChangedAtUtc.HasValue)
 					{
-						msg = "Є!";
+						timeMsgPart = $"з {TimeZoneInfo.ConvertTimeFromUtc(StatusChangedAtUtc.Value, KyivTimezone):HH:mm dd.MM.yyyy}";
+					}
+					var msg = $"Нема :( {timeMsgPart}";
+					if (Status)
+					{
+						msg = $"Є! {timeMsgPart}";
 					}
 
 					Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
@@ -56,10 +63,29 @@ namespace MMSvitloE
 			bot = new TelegramBotClient(configuration["botToken"]);
 		}
 
+		public static void ReadStatus()
+		{
+			var newStatus = new Utils().PingHost(configuration["ipToPing"]);
+			var now = DateTime.UtcNow;
+			if (newStatus != Status)
+			{
+				Status = newStatus;
+				StatusChangedAtUtc = DateTime.UtcNow;
+			}
+			//TODO comment it after testing
+			Console.WriteLine($"new status: {newStatus}: {TimeZoneInfo.ConvertTimeFromUtc(now, KyivTimezone):HH:mm dd.MM.yyyy}");
+		}
+
 
 		static void Main(string[] args)
 		{
 			InitConfiguration();
+
+			var timer = new Timer(
+				e => ReadStatus(),
+				null,
+				TimeSpan.Zero,
+				TimeSpan.FromMinutes(1));
 
 			var cts = new CancellationTokenSource();
 			var cancellationToken = cts.Token;
