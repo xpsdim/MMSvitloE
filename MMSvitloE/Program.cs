@@ -28,7 +28,9 @@ namespace MMSvitloE
 					var timeMsgPart = string.Empty;
 					if (StatusChangedAtUtc.HasValue)
 					{
-						timeMsgPart = $"з {TimeZoneInfo.ConvertTimeFromUtc(StatusChangedAtUtc.Value, KyivTimezone):HH:mm dd.MM.yyyy}";
+						var period = DateTime.UtcNow - StatusChangedAtUtc.Value;
+						var periodStr = period.TimespanToReadableStr();
+						timeMsgPart = $"з {TimeZoneInfo.ConvertTimeFromUtc(StatusChangedAtUtc.Value, KyivTimezone):HH:mm dd.MM.yyyy}{periodStr}";
 					}
 					var msg = $"Нема :( {timeMsgPart}";
 					if (Status)
@@ -75,7 +77,6 @@ namespace MMSvitloE
 			//TODO comment it after testing
 			//Console.WriteLine($"new status: {newStatus}: {TimeZoneInfo.ConvertTimeFromUtc(now, KyivTimezone):HH:mm dd.MM.yyyy}");
 		}
-
 
 		static void Main(string[] args)
 		{
