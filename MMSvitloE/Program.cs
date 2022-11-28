@@ -10,6 +10,7 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MMSvitloE.Db;
+using MMSvitloE.ConfigurationService;
 
 namespace MMSvitloE
 {
@@ -57,28 +58,10 @@ namespace MMSvitloE
 
 		public static void InitConfiguration()
 		{
-			ServiceCollection serviceCollection = new ServiceCollection();
-			// Build configuration
-			configuration = new ConfigurationBuilder()
-				.SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-				.AddJsonFile("appsettings.json", false)
-				.Build();
-
-			// Add access to generic IConfigurationRoot
-			serviceCollection.AddSingleton<IConfigurationRoot>(configuration);
+			configuration = new ConfigurationServiceFactory().CreateInstance();
 			bot = new TelegramBotClient(configuration["botToken"]);
-
-			var connectionString = configuration["connectionStrings"];
-			var serverVersion = new MySqlServerVersion(new Version(10, 3, 35));
-
-			var optionsBuilder = new DbContextOptionsBuilder<BotDbContext>();
-			optionsBuilder.UseMySql(connectionString, serverVersion)
-				//TODO for debugging
-				.LogTo(Console.WriteLine, LogLevel.Information)
-				.EnableSensitiveDataLogging()
-				.EnableDetailedErrors();
-
-			dbConext = new BotDbContext(optionsBuilder.Options);
+			BotContextFactory.ConnectionString = configuration["connectionStrings"];
+			dbConext = new BotContextFactory().CreateDbContext(null);
 		}
 
 		public static void ReadStatus()

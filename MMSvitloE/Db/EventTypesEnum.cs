@@ -2,7 +2,7 @@
 {
 	public enum EventTypesEnum
 	{
-		RouterStartPinging = 1,
-		RouterEndPinging = 2
+		PingSuccess = 1,
+		PingTimeout = 2
 	}
 }

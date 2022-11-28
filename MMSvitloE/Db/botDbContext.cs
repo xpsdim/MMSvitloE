@@ -6,10 +6,15 @@ namespace MMSvitloE.Db
 	{
 		public BotDbContext(DbContextOptions<BotDbContext> options)
 			: base(options)
-		{
-
-		}
+		{ }
 
 		public DbSet<Event> Events { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<Event>()
+				.Property(f => f.Id)
+				.ValueGeneratedOnAdd();
+		}
 	}
 }
