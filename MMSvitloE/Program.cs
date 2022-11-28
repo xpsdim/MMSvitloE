@@ -7,6 +7,10 @@ using Telegram.Bot.Types;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using MMSvitloE.Db;
+using MMSvitloE.ConfigurationService;
 
 namespace MMSvitloE
 {
@@ -17,6 +21,7 @@ namespace MMSvitloE
 		public static DateTime? StatusChangedAtUtc = null;
 		public static bool Status = true;
 		public static TimeZoneInfo KyivTimezone = TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
+		public static BotDbContext dbConext;
 
 		public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 		{
@@ -53,16 +58,10 @@ namespace MMSvitloE
 
 		public static void InitConfiguration()
 		{
-			ServiceCollection serviceCollection = new ServiceCollection();
-			// Build configuration
-			configuration = new ConfigurationBuilder()
-				.SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-				.AddJsonFile("appsettings.json", false)
-				.Build();
-
-			// Add access to generic IConfigurationRoot
-			serviceCollection.AddSingleton<IConfigurationRoot>(configuration);
+			configuration = new ConfigurationServiceFactory().CreateInstance();
 			bot = new TelegramBotClient(configuration["botToken"]);
+			BotContextFactory.ConnectionString = configuration["connectionStrings"];
+			dbConext = new BotContextFactory().CreateDbContext(null);
 		}
 
 		public static void ReadStatus()
