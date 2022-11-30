@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using Microsoft.Extensions.Configuration;
 using MMSvitloE.Db;
 using MMSvitloE.ConfigurationService;
+using Telegram.Bot.Exceptions;
 
 namespace MMSvitloE
 {
@@ -27,7 +28,15 @@ namespace MMSvitloE
 				switch (messageTxt)
 				{
 					case "/start":
-						await botClient.SendTextMessageAsync(message.Chat, $"Вітаю, {message.From.FirstName} {message.From.LastName}!{Environment.NewLine}Цей бот підтримує такі команди:{Environment.NewLine}/start - показує стартову сторінку з переліком команд{Environment.NewLine}/status - відображає поточний стан наявності світла в нашому ЖК{Environment.NewLine}/follow - підписатись на оновлення по світлу{Environment.NewLine}/unfollow - відписатись та припинити отримувати оновлення по світлу");
+						try
+						{
+							await botClient.SendTextMessageAsync(message.Chat, $"Вітаю, {message.From.FirstName} {message.From.LastName}!{Environment.NewLine}Цей бот підтримує такі команди:{Environment.NewLine}/start - показує стартову сторінку з переліком команд{Environment.NewLine}/status - відображає поточний стан наявності світла в нашому ЖК{Environment.NewLine}/follow - підписатись на оновлення по світлу{Environment.NewLine}/unfollow - відписатись та припинити отримувати оновлення по світлу");
+						}
+						catch (ApiRequestException ex)
+						{
+							Console.WriteLine(ex.Message);
+							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+						}
 						return;
 					case "/status":
 						var timeMsgPart = string.Empty;
@@ -43,20 +52,52 @@ namespace MMSvitloE
 							msg = $"Є! {timeMsgPart}";
 						}
 
-						Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
-						await botClient.SendTextMessageAsync(message.Chat, msg);
-						await new Utils().SaveMessageToDBAsync(message, msg);
+						try
+						{
+							Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
+							await botClient.SendTextMessageAsync(message.Chat, msg);
+							await new Utils().SaveMessageToDBAsync(message, msg);
+						}
+						catch (ApiRequestException ex)
+						{
+							Console.WriteLine(ex.Message);
+							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+						}
 						return;
 					case "/follow":
-						await new Utils().UpdateFollower(message.From, follow: true);
-						await botClient.SendTextMessageAsync(message.Chat, $"Вітаю, {message.From.FirstName} {message.From.LastName}! Ви тепер підписані на повідомлення щодо включення/відключення світла у нашому ЖК.");
+						try
+						{
+							await new Utils().UpdateFollower(message.From, follow: true);
+							await botClient.SendTextMessageAsync(message.Chat, $"Вітаю, {message.From.FirstName} {message.From.LastName}! Ви тепер підписані на повідомлення щодо включення/відключення світла у нашому ЖК.");
+						}
+						catch (ApiRequestException ex)
+						{
+							Console.WriteLine(ex.Message);
+							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+						}
 						return;
 					case "/unfollow":
-						await new Utils().UpdateFollower(message.From, follow: false);
-						await botClient.SendTextMessageAsync(message.Chat, "Вас відписано!");
+						try
+						{
+							await botClient.SendTextMessageAsync(message.Chat, "Вас відписано!");
+							await new Utils().UpdateFollower(message.From, follow: false);
+						}
+						catch (ApiRequestException ex)
+						{
+							Console.WriteLine(ex.Message);
+							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+						}
 						return;
 					default:
-						await botClient.SendTextMessageAsync(message.Chat, $"Команда {messageTxt} не підтримується ботом.");
+						try
+						{
+							await botClient.SendTextMessageAsync(message.Chat, $"Команда {messageTxt} не підтримується ботом.");
+						}
+						catch (ApiRequestException ex)
+						{
+							Console.WriteLine(ex.Message);
+							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+						}
 						return;
 				}
 			}

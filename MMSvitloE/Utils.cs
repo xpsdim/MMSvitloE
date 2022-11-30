@@ -1,8 +1,10 @@
 ﻿using MMSvitloE.Db;
+using System;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 
 namespace MMSvitloE
@@ -130,7 +132,14 @@ namespace MMSvitloE
 			var context = new BotContextFactory().CreateDbContext(null);
 			foreach(var follower in context.Followers)
 			{
-				await bot.SendTextMessageAsync(follower.Id, mesage);
+				try
+				{
+					await bot.SendTextMessageAsync(follower.Id, mesage);
+				}
+				catch(ApiRequestException ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
 			}
 		}
 	}
