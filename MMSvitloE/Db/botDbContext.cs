@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace MMSvitloE.Db
 {
@@ -14,7 +15,12 @@ namespace MMSvitloE.Db
 		{
 			modelBuilder.Entity<Event>()
 				.Property(f => f.Id)
+				.IsRequired()
 				.ValueGeneratedOnAdd();
+
+			modelBuilder.Entity<Event>()
+				.HasIndex(p => p.DateUtc)
+				.IsUnique(false);
 		}
 	}
 }
