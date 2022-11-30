@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace MMSvitloE.Db
 {
@@ -11,6 +10,7 @@ namespace MMSvitloE.Db
 
 		public DbSet<Event> Events { get; set; }
 		public DbSet<Follower> Followers { get; set; }
+		public DbSet<MessageLogItem> MessageLog { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

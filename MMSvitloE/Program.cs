@@ -27,6 +27,9 @@ namespace MMSvitloE
 				switch (messageTxt)
 				{
 					case "/start":
+						await botClient.SendTextMessageAsync(message.Chat, $"Вітаю, {message.From.FirstName} {message.From.LastName}!{Environment.NewLine}Цей бот підтримує такі команди:{Environment.NewLine}/start - показує стартову сторінку з переліком команд{Environment.NewLine}/status - відображає поточний стан наявності світла в нашому ЖК{Environment.NewLine}/follow - підписатись на оновлення по світлу{Environment.NewLine}/unfollow - відписатись та припинити отримувати оновлення по світлу");
+						return;
+					case "/status":
 						var timeMsgPart = string.Empty;
 						if (StatusChangedAtUtc.HasValue)
 						{
@@ -42,6 +45,15 @@ namespace MMSvitloE
 
 						Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
 						await botClient.SendTextMessageAsync(message.Chat, msg);
+						await new Utils().SaveMessageToDBAsync(message, msg);
+						return;
+					case "/follow":
+						await new Utils().UpdateFollower(message.From, follow: true);
+						await botClient.SendTextMessageAsync(message.Chat, $"Вітаю, {message.From.FirstName} {message.From.LastName}! Ви тепер підписані на повідомлення щодо включення/відключення світла у нашому ЖК.");
+						return;
+					case "/unfollow":
+						await new Utils().UpdateFollower(message.From, follow: false);
+						await botClient.SendTextMessageAsync(message.Chat, "Вас відписано!");
 						return;
 					default:
 						await botClient.SendTextMessageAsync(message.Chat, $"Команда {messageTxt} не підтримується ботом.");
