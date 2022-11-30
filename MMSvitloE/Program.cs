@@ -23,24 +23,29 @@ namespace MMSvitloE
 			if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message)
 			{
 				var message = update.Message;
-				if (message.Text?.ToLower() == "/start")
+				var messageTxt = message.Text?.ToLower();
+				switch (messageTxt)
 				{
-					var timeMsgPart = string.Empty;
-					if (StatusChangedAtUtc.HasValue)
-					{
-						var period = DateTime.UtcNow - StatusChangedAtUtc.Value;
-						var periodStr = period.TimespanToReadableStr();
-						timeMsgPart = $"з {TimeZoneInfo.ConvertTimeFromUtc(StatusChangedAtUtc.Value, KyivTimezone):HH:mm dd.MM.yyyy}{periodStr}";
-					}
-					var msg = $"Нема :( {timeMsgPart}";
-					if (Status)
-					{
-						msg = $"Є! {timeMsgPart}";
-					}
+					case "/start":
+						var timeMsgPart = string.Empty;
+						if (StatusChangedAtUtc.HasValue)
+						{
+							var period = DateTime.UtcNow - StatusChangedAtUtc.Value;
+							var periodStr = period.TimespanToReadableStr();
+							timeMsgPart = $"з {TimeZoneInfo.ConvertTimeFromUtc(StatusChangedAtUtc.Value, KyivTimezone):HH:mm dd.MM.yyyy}{periodStr}";
+						}
+						var msg = $"Нема :( {timeMsgPart}";
+						if (Status)
+						{
+							msg = $"Є! {timeMsgPart}";
+						}
 
-					Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
-					await botClient.SendTextMessageAsync(message.Chat, msg);
-					return;
+						Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
+						await botClient.SendTextMessageAsync(message.Chat, msg);
+						return;
+					default:
+						await botClient.SendTextMessageAsync(message.Chat, $"Команда {messageTxt} не підтримується ботом.");
+						return;
 				}
 			}
 		}
