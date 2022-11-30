@@ -10,6 +10,7 @@ namespace MMSvitloE.Db
 		{ }
 
 		public DbSet<Event> Events { get; set; }
+		public DbSet<Follower> Followers { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
