@@ -60,13 +60,23 @@ namespace MMSvitloE
 
 		public static async Task<bool> ReadStatusAsync()
 		{
+			var utils = new Utils();
+
+			//try to restore last status from DB
+			var lastEvent = utils.ReadLastEvent();
+			if (lastEvent != null)
+			{
+				Status = lastEvent.EventType == EventTypesEnum.PingSuccess;
+				StatusChangedAtUtc = lastEvent.DateUtc;
+			}
+
 			var newStatus = new Utils().PingHost(configuration["ipToPing"]);
 			var now = DateTime.UtcNow;
 			if (newStatus != Status)
 			{
 				Status = newStatus;
 				StatusChangedAtUtc = DateTime.UtcNow;
-				await new Utils().SaveEvent(newStatus ? EventTypesEnum.PingSuccess : EventTypesEnum.PingTimeout);
+				await utils.SaveEvent(newStatus ? EventTypesEnum.PingSuccess : EventTypesEnum.PingTimeout);
 				return true;
 			}
 			//TODO comment it after testing
