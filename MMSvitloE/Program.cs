@@ -68,7 +68,7 @@ namespace MMSvitloE
 			Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
 		}
 
-		public static void InitConfiguration()
+		public static async Task InitConfigurationAsync()
 		{
 			configuration = new ConfigurationServiceFactory().CreateInstance();
 			bot = new TelegramBotClient(configuration["botToken"]);
@@ -94,6 +94,7 @@ namespace MMSvitloE
 				Status = newStatus;
 				StatusChangedAtUtc = DateTime.UtcNow;
 				await utils.SaveEvent(newStatus ? EventTypesEnum.PingSuccess : EventTypesEnum.PingTimeout);
+				await utils.InformFollowersAboutStatusChangingAsync(bot, newStatus);
 				return true;
 			}
 			//TODO comment it after testing
@@ -108,7 +109,7 @@ namespace MMSvitloE
 
 		static async Task Main(string[] args)
 		{
-			InitConfiguration();
+			await InitConfigurationAsync();
 
 			var timer = new Timer(
 				e => ReadStatus(),

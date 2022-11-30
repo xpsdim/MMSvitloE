@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace MMSvitloE
@@ -118,6 +119,19 @@ namespace MMSvitloE
 			}
 
 			await context.SaveChangesAsync();
+		}
+
+		public async Task InformFollowersAboutStatusChangingAsync(ITelegramBotClient bot, bool newStstus)
+		{
+			var mesage = newStstus
+				? "Щойно з'явилось світло!"
+				: "Пропало світло :(";
+
+			var context = new BotContextFactory().CreateDbContext(null);
+			foreach(var follower in context.Followers)
+			{
+				await bot.SendTextMessageAsync(follower.Id, mesage);
+			}
 		}
 	}
 }
