@@ -22,11 +22,11 @@ namespace MMSvitloE.Db
 				ConnectionString = configuration["connectionStrings"];
 			}
 
-			optionsBuilder.UseMySql(ConnectionString, serverVersion)
+			optionsBuilder.UseMySql(ConnectionString, serverVersion);
 				//TODO for debugging
-				.LogTo(Console.WriteLine, LogLevel.Information)
-				.EnableSensitiveDataLogging()
-				.EnableDetailedErrors();
+				//.LogTo(Console.WriteLine, LogLevel.Information)
+				//.EnableSensitiveDataLogging()
+				//.EnableDetailedErrors();
 
 			return new BotDbContext(optionsBuilder.Options);
 		}

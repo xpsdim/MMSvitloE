@@ -5,10 +5,6 @@ using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using MMSvitloE.Db;
 using MMSvitloE.ConfigurationService;
 
@@ -64,7 +60,7 @@ namespace MMSvitloE
 			dbConext = new BotContextFactory().CreateDbContext(null);
 		}
 
-		public static void ReadStatus()
+		public static async Task<bool> ReadStatusAsync()
 		{
 			var newStatus = new Utils().PingHost(configuration["ipToPing"]);
 			var now = DateTime.UtcNow;
@@ -72,12 +68,20 @@ namespace MMSvitloE
 			{
 				Status = newStatus;
 				StatusChangedAtUtc = DateTime.UtcNow;
+				await new Utils().SaveEvent(newStatus ? EventTypesEnum.PingSuccess : EventTypesEnum.PingTimeout);
+				return true;
 			}
 			//TODO comment it after testing
 			//Console.WriteLine($"new status: {newStatus}: {TimeZoneInfo.ConvertTimeFromUtc(now, KyivTimezone):HH:mm dd.MM.yyyy}");
+			return false;
 		}
 
-		static void Main(string[] args)
+		public static bool ReadStatus()
+		{
+			return ReadStatusAsync().Result;
+		}
+
+		static async Task Main(string[] args)
 		{
 			InitConfiguration();
 

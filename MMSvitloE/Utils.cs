@@ -1,4 +1,6 @@
-﻿using System.Net.NetworkInformation;
+﻿using MMSvitloE.Db;
+using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 
 namespace MMSvitloE
 {
@@ -37,6 +39,19 @@ namespace MMSvitloE
 			}
 
 			return successCnt > 0;
+		}
+
+		public async Task SaveEvent(EventTypesEnum eventType)
+		{
+			var context = new BotContextFactory().CreateDbContext(null);
+			var newEvent = new Event()
+			{
+				EventType = eventType,
+				DateUtc = System.DateTime.UtcNow
+			};
+
+			context.Events.Add(newEvent);
+			await context.SaveChangesAsync();
 		}
 	}
 }
