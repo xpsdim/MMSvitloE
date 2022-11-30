@@ -17,7 +17,6 @@ namespace MMSvitloE
 		public static DateTime? StatusChangedAtUtc = null;
 		public static bool Status = true;
 		public static TimeZoneInfo KyivTimezone = TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
-		public static BotDbContext dbConext;
 
 		public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 		{
@@ -57,7 +56,6 @@ namespace MMSvitloE
 			configuration = new ConfigurationServiceFactory().CreateInstance();
 			bot = new TelegramBotClient(configuration["botToken"]);
 			BotContextFactory.ConnectionString = configuration["connectionStrings"];
-			dbConext = new BotContextFactory().CreateDbContext(null);
 		}
 
 		public static async Task<bool> ReadStatusAsync()
