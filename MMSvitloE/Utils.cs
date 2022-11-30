@@ -1,4 +1,5 @@
 ﻿using MMSvitloE.Db;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
@@ -52,6 +53,14 @@ namespace MMSvitloE
 
 			context.Events.Add(newEvent);
 			await context.SaveChangesAsync();
+		}
+
+		public Event ReadLastEvent()
+		{
+			var context = new BotContextFactory().CreateDbContext(null);
+			return context.Events
+				.OrderByDescending(p => p.DateUtc)
+				.FirstOrDefault();
 		}
 	}
 }
