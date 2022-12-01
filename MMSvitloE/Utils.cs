@@ -130,7 +130,7 @@ namespace MMSvitloE
 				: "Пропало світло :(";
 
 			var context = new BotContextFactory().CreateDbContext(null);
-			foreach(var follower in context.Followers)
+			foreach(var follower in context.Followers.Where(f => f.FollowingSvitloBot))
 			{
 				try
 				{
