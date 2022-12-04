@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Logging;
 using MMSvitloE.ConfigurationService;
 using System;
-using System.Configuration;
 
 namespace MMSvitloE.Db
 {
