@@ -1,5 +1,5 @@
 # MMSvitloE
-Telegram bot for checking electricity at home
+Telegram bot for checking electricity at home (Ukrainian Blackout Edition)
 
 ## Requirements:
 - .NET 6.0 SDK
