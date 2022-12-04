@@ -140,7 +140,7 @@ namespace MMSvitloE
 			var site = configuration["webSiteToGet"];
 			if (newStatus && !string.IsNullOrEmpty(site))
 			{
-				newStatus = utils.CheckWebSite(configuration["webSiteToGet"]);
+				newStatus = await utils.CheckWebSiteAsync(configuration["webSiteToGet"]);
 			}
 
 			//set new status if it changed and send notifications to followers

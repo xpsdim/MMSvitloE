@@ -56,11 +56,18 @@ namespace MMSvitloE
 			return successCnt > 0;
 		}
 
-		public bool CheckWebSite(string siteUrl)
+		public  async Task<bool> CheckWebSiteAsync(string siteUrl)
 		{
 			var client = httpClientFactory.CreateClient();
-			var result = client.GetAsync(siteUrl).Result;
-			return result.IsSuccessStatusCode;
+			try
+			{
+				var result = await client.GetAsync(siteUrl);
+				return result.IsSuccessStatusCode;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 
 		public async Task SaveEvent(EventTypesEnum eventType)
