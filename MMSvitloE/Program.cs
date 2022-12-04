@@ -18,6 +18,7 @@ namespace MMSvitloE
 		public static DateTime? StatusChangedAtUtc = null;
 		public static bool Status = true;
 		public static TimeZoneInfo KyivTimezone = TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
+		public static Utils utils;
 
 		public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 		{
@@ -35,7 +36,7 @@ namespace MMSvitloE
 						catch (ApiRequestException ex)
 						{
 							Console.WriteLine(ex.Message);
-							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+							await utils.SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
 						}
 						return;
 					case "/status":
@@ -56,36 +57,36 @@ namespace MMSvitloE
 						{
 							Console.WriteLine($"{message.From.FirstName} {message.From.LastName} - {msg}");
 							await botClient.SendTextMessageAsync(message.Chat, msg);
-							await new Utils().SaveMessageToDBAsync(message, msg);
+							await utils.SaveMessageToDBAsync(message, msg);
 						}
 						catch (ApiRequestException ex)
 						{
 							Console.WriteLine(ex.Message);
-							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+							await utils.SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
 						}
 						return;
 					case "/follow":
 						try
 						{
-							await new Utils().UpdateFollower(message.From, follow: true);
+							await utils.UpdateFollower(message.From, follow: true);
 							await botClient.SendTextMessageAsync(message.Chat, $"Вітаю, {message.From.FirstName} {message.From.LastName}! Ви тепер підписані на повідомлення щодо включення/відключення світла у нашому ЖК.");
 						}
 						catch (ApiRequestException ex)
 						{
 							Console.WriteLine(ex.Message);
-							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+							await utils.SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
 						}
 						return;
 					case "/unfollow":
 						try
 						{
 							await botClient.SendTextMessageAsync(message.Chat, "Вас відписано!");
-							await new Utils().UpdateFollower(message.From, follow: false);
+							await utils.UpdateFollower(message.From, follow: false);
 						}
 						catch (ApiRequestException ex)
 						{
 							Console.WriteLine(ex.Message);
-							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+							await utils.SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
 						}
 						return;
 					default:
@@ -96,7 +97,7 @@ namespace MMSvitloE
 						catch (ApiRequestException ex)
 						{
 							Console.WriteLine(ex.Message);
-							await new Utils().SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
+							await utils.SaveMessageToDBAsync(message, $"{messageTxt}: {ex.Message}");
 						}
 						return;
 				}
@@ -114,12 +115,11 @@ namespace MMSvitloE
 			configuration = new ConfigurationServiceFactory().CreateInstance();
 			bot = new TelegramBotClient(configuration["botToken"]);
 			BotContextFactory.ConnectionString = configuration["connectionStrings"];
+			utils = new Utils();
 		}
 
 		public static async Task<bool> ReadStatusAsync()
 		{
-			var utils = new Utils();
-
 			//try to restore last status from DB
 			var lastEvent = utils.ReadLastEvent();
 			if (lastEvent != null)
@@ -128,8 +128,22 @@ namespace MMSvitloE
 				StatusChangedAtUtc = lastEvent.DateUtc;
 			}
 
-			var newStatus = new Utils().PingHost(configuration["ipToPing"]);
-			var now = DateTime.UtcNow;
+			//try to ping IP first if it's configured
+			var newStatus = true;
+			var ip = configuration["ipToPing"];
+			if (!string.IsNullOrEmpty(ip))
+			{
+				newStatus = utils.PingHost(ip);
+			}
+
+			//then try to get site if it configured and ping by IP was success or skipped
+			var site = configuration["webSiteToGet"];
+			if (newStatus && !string.IsNullOrEmpty(site))
+			{
+				newStatus = utils.CheckWebSite(configuration["webSiteToGet"]);
+			}
+
+			//set new status if it changed and send notifications to followers
 			if (newStatus != Status)
 			{
 				Status = newStatus;
@@ -138,8 +152,6 @@ namespace MMSvitloE
 				await utils.InformFollowersAboutStatusChangingAsync(bot, newStatus);
 				return true;
 			}
-			//TODO comment it after testing
-			//Console.WriteLine($"new status: {newStatus}: {TimeZoneInfo.ConvertTimeFromUtc(now, KyivTimezone):HH:mm dd.MM.yyyy}");
 			return false;
 		}
 

@@ -1,6 +1,8 @@
-﻿using MMSvitloE.Db;
+﻿using Microsoft.Extensions.DependencyInjection;
+using MMSvitloE.Db;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -11,6 +13,14 @@ namespace MMSvitloE
 {
 	public class Utils
 	{
+		static IHttpClientFactory httpClientFactory;
+
+		static Utils()
+		{
+			var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+			httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+		}
+
 		public bool PingHost(string ip)
 		{
 			//set the ping options, TTL 128
@@ -44,6 +54,13 @@ namespace MMSvitloE
 			}
 
 			return successCnt > 0;
+		}
+
+		public bool CheckWebSite(string siteUrl)
+		{
+			var client = httpClientFactory.CreateClient();
+			var result = client.GetAsync(siteUrl).Result;
+			return result.IsSuccessStatusCode;
 		}
 
 		public async Task SaveEvent(EventTypesEnum eventType)
