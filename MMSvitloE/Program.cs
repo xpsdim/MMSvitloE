@@ -47,10 +47,10 @@ namespace MMSvitloE
 							var periodStr = period.TimespanToReadableStr();
 							timeMsgPart = $"з {TimeZoneInfo.ConvertTimeFromUtc(StatusChangedAtUtc.Value, KyivTimezone):HH:mm dd.MM.yyyy}{periodStr}";
 						}
-						var msg = $"Нема :( {timeMsgPart}";
+						var msg = $"Нема 😕 {timeMsgPart}";
 						if (Status)
 						{
-							msg = $"Є! {timeMsgPart}";
+							msg = $"Є! 😀 {timeMsgPart}";
 						}
 
 						try
