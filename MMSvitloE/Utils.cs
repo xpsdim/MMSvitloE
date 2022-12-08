@@ -147,11 +147,18 @@ namespace MMSvitloE
 			await context.SaveChangesAsync();
 		}
 
-		public async Task InformFollowersAboutStatusChangingAsync(ITelegramBotClient bot, bool newStstus)
+		public async Task InformFollowersAboutStatusChangingAsync(ITelegramBotClient bot, bool newStstus, TimeSpan? statusBeforeLen)
 		{
-			var mesage = newStstus
-				? "Щойно з'явилось світло!"
-				: "Пропало світло :(";
+			var mesage = $"{(newStstus ? "Щойно з'явилось світло!" : "Пропало світло :(")}";
+
+			if (statusBeforeLen != null)
+			{
+				var showSpan = statusBeforeLen != null && statusBeforeLen > TimeSpan.FromMinutes(5);
+				if (showSpan)
+				{
+					mesage = $"{mesage}{Environment.NewLine}({((newStstus ? "не було" : "було "))}{statusBeforeLen.Value.TimespanToReadableStr()})";
+				}
+			}
 
 			var context = new BotContextFactory().CreateDbContext(null);
 			foreach(var follower in context.Followers.Where(f => f.FollowingSvitloBot))

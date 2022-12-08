@@ -12,7 +12,7 @@ namespace MMSvitloE
 				var d = period.Days;
 				var h = period.Hours;
 				var m = period.Minutes;
-				periodStr = $"{Environment.NewLine}вже {(d > 0 ? $"{period.Days} дн" : string.Empty)} {(h > 0 ? $"{period.Hours} год" : string.Empty)} {(m > 0 ? $"{period.Minutes} хв" : string.Empty)}";
+				periodStr = $"{(d > 0 ? $"{period.Days} дн" : string.Empty)} {(h > 0 ? $"{period.Hours} год" : string.Empty)} {(m > 0 ? $"{period.Minutes} хв" : string.Empty)}";
 			}
 
 			return periodStr;

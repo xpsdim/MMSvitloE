@@ -44,7 +44,7 @@ namespace MMSvitloE
 						if (StatusChangedAtUtc.HasValue)
 						{
 							var period = DateTime.UtcNow - StatusChangedAtUtc.Value;
-							var periodStr = period.TimespanToReadableStr();
+							var periodStr = $"{Environment.NewLine}вже {period.TimespanToReadableStr()}";
 							timeMsgPart = $"з {TimeZoneInfo.ConvertTimeFromUtc(StatusChangedAtUtc.Value, KyivTimezone):HH:mm dd.MM.yyyy}{periodStr}";
 						}
 						var msg = $"Нема 😕 {timeMsgPart}";
@@ -147,9 +147,10 @@ namespace MMSvitloE
 			if (newStatus != Status)
 			{
 				Status = newStatus;
+				var prevStatusStartedAt = StatusChangedAtUtc;
 				StatusChangedAtUtc = DateTime.UtcNow;
 				await utils.SaveEvent(newStatus ? EventTypesEnum.PingSuccess : EventTypesEnum.PingTimeout);
-				await utils.InformFollowersAboutStatusChangingAsync(bot, newStatus);
+				await utils.InformFollowersAboutStatusChangingAsync(bot, newStatus, (prevStatusStartedAt == null ? null : StatusChangedAtUtc - prevStatusStartedAt.Value));
 				return true;
 			}
 			return false;
