@@ -44,7 +44,12 @@ namespace MMSvitloE
 						if (StatusChangedAtUtc.HasValue)
 						{
 							var period = DateTime.UtcNow - StatusChangedAtUtc.Value;
-							var periodStr = $"{Environment.NewLine}вже {period.TimespanToReadableStr()}";
+							var timeSpanStr = period.TimespanToReadableStr();
+							var periodStr = string.Empty;
+							if (!string.IsNullOrEmpty(timeSpanStr))
+							{
+								periodStr = $"{Environment.NewLine}вже {timeSpanStr}";
+							}
 							timeMsgPart = $"з {TimeZoneInfo.ConvertTimeFromUtc(StatusChangedAtUtc.Value, KyivTimezone):HH:mm dd.MM.yyyy}{periodStr}";
 						}
 						var msg = $"Нема 😕 {timeMsgPart}";
