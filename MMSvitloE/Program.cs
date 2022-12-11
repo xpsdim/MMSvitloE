@@ -174,7 +174,7 @@ namespace MMSvitloE
 				e => ReadStatus(),
 				null,
 				TimeSpan.Zero,
-				TimeSpan.FromMinutes(1));
+				TimeSpan.FromSeconds(int.Parse(configuration["checkStatusPeriod"])));
 
 			var cts = new CancellationTokenSource();
 			var cancellationToken = cts.Token;
